@@ -2,14 +2,14 @@ export default (sequelize, DataTypes) => {
   const song = sequelize.define(
     "song",
     {
-      song_id: {
+      id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        unique: true,
+        autoIncrement: true,
         primaryKey: true,
       },
       title: {
         type: DataTypes.STRING,
+        allowNull: false
       },
 
       artist_id: {
@@ -20,5 +20,6 @@ export default (sequelize, DataTypes) => {
     { freezeTableName: true, timestamps: false }
   );
   
+  // song.sync({force: true})
   return song;
 };

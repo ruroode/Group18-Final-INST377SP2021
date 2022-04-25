@@ -25,13 +25,13 @@ router.route('/songs')
     }
 })
 
-router.route('/songs/:song_id')
+router.route('/songs/:id')
 .get(async (req, res) => {
     try {
-      const {song_id} = req.params;
+      const {id} = req.params;
       const song = await db.song.findAll({
         where: {
-          song_id: song_id
+          id: id
         }
       });
       res.json({data: song})
@@ -42,11 +42,8 @@ router.route('/songs/:song_id')
 });
 
 router.route('/songs').post( async (req, res) => {
-  const songList = await db.song.findAll();
-  const currentId = (await songList.length) + 1;
   try {
     const newSong = await db.song.create({
-      song_id: currentId,
       title: req.body.title,
       artist_id: req.body.artist_id,
     });
@@ -54,6 +51,43 @@ router.route('/songs').post( async (req, res) => {
   } catch (err) {
     console.error(err);
     res.json({message: 'Server error'});
+  }
+});
+
+
+router.delete('/songs/:id', async (req, res) => {
+  try {
+
+    const song = await db.song.findOne({where: {id: req.params.id}});
+
+    if (!song) {
+      throw Error(`Song not found`)
+    }
+    
+    await song.destroy();
+    res.json({message: 'Successfully Deleted'});
+  } catch (err) {
+    console.error(err);
+    res.json({message: err.message});
+  }
+});
+
+router.put('/songs/:id', async (req, res) => {
+  try {
+
+    const song = await db.song.findOne({where: {id: req.params.id}});
+
+    if (!song) {
+      throw Error(`Song not found`)
+    }
+
+    song.title = req.body.title;
+    song.artist_id = req.body.artist_id;
+    await song.save();
+    res.json({message: 'Successfully Updated'});
+  } catch (err) {
+    console.error(err);
+    res.json({message: err.message});
   }
 });
 
